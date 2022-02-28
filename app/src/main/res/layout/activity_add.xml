@@ -18,7 +18,7 @@
         app:srcCompat="@android:drawable/ic_menu_edit" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/outlinedTextField"
+        android:id="@+id/memo_text_field"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="160dp"

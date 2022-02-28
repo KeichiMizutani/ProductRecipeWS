@@ -1,37 +1,79 @@
 package com.example.productrecipews
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.marginStart
+import androidx.appcompat.app.AppCompatActivity
 import com.example.productrecipews.databinding.ActivityMainBinding
+import org.json.JSONArray
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    var itemStrList: ArrayList<String> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(this.root) }
 
 
-        val item1 = Item("Item1")
-        val item2 = Item("Item2")
-        val item3 = Item("Item3")
+        // 読み込み
+        itemStrList =  loadArrayList("test")
 
-        addItem(item1)
-        addItem(item2)
-        addItem(item3)
+
+        val addedItem = intent.getStringExtra("Item")
+        if (addedItem != null) {
+            itemStrList.add(addedItem)
+        }
+
+        // 保存
+        saveArrayList("test", itemStrList)
+
+
+        for(item in itemStrList){
+            addItem(Item(item))
+        }
 
         binding.addMemoButton.setOnClickListener{
             val addIntent: Intent = Intent(this, AddActivity::class.java)
+
             startActivity(addIntent)
         }
+    }
+
+    private fun saveArrayList(key: String, arrayList: ArrayList<String>){
+
+        val shardPreferences = this.getPreferences(Context.MODE_PRIVATE)
+        val shardPrefEditor = shardPreferences.edit()
+
+        val jsonArray = JSONArray(arrayList)
+        shardPrefEditor.putString(key, jsonArray.toString())
+        shardPrefEditor.apply()
+
+    }
+
+    fun loadArrayList(key: String) : ArrayList<String> {
+
+        val shardPreferences = this.getPreferences(Context.MODE_PRIVATE)
+
+        val jsonArray = JSONArray(shardPreferences.getString(key, "[]"));
+
+        val arrayList : ArrayList<String> = ArrayList()
+
+        for (i in 0 until jsonArray.length()) {
+            arrayList.add(jsonArray.get(i) as String)
+        }
+
+        return arrayList
     }
 
     private fun addItem(item: Item){
